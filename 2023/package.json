@@ -2,9 +2,9 @@
   "name": "aoc_2023",
   "version": "1.0.0",
   "description": "Advent of Code 2023 solutions",
-  "main": "index.ts",
+  "main": "src/index.ts",
   "scripts": {
-    "day": "ts-node index.ts"
+    "day": "ts-node src/index.ts"
   },
   "repository": {
     "type": "git",

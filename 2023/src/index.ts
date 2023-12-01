@@ -10,7 +10,7 @@ if (isNaN(day) || day < 0 || day > 25) {
   process.exit(1);
 }
 
-const solutionPath = path.join(__dirname, 'src', day.toString(), 'solution.ts');
+const solutionPath = path.join(__dirname, day.toString(), 'solution.ts');
 
 fs.access(solutionPath, fs.constants.F_OK, (err) => {
   if (err) {
