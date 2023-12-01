@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import { Solution } from './src/types';
+import { Solution } from './types';
 
 const args = process.argv.slice(2);
 const day = Number(args[0]);
