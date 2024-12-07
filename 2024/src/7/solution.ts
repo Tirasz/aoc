@@ -47,8 +47,12 @@ function buildTree(root: Node, values: number[], target: number, childrenFn: (no
 
     currentNodes!.forEach(node => {
       node!.children = childrenFn(node!, currentValue!);
-      node!.children?.filter(child => child.value < target).forEach(child => toAdd.push(child));
-      node!.children?.filter(child => child.value === target).forEach(child => child.markAsHitTarget());
+      node!.children?.filter(child => child.value <= target).forEach(child => toAdd.push(child));
+      node!.children?.filter(child => child.value === target).forEach(child => {
+        if (arrayCopy.length === 0) {
+          child.markAsHitTarget()
+        }
+      });
     })
 
     nodesToAddChildren.push(toAdd);
