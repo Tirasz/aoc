@@ -55,9 +55,9 @@ class Disk {
 
   }
 
-  firstEmptyIndex() {
+  firstEmptyIndex(minSize = 1) {
     for (let i = 0; i < this.blocks.length; i++) {
-      if (this.blocks[i].id === undefined && this.blocks[i].size > 0) {
+      if (this.blocks[i].id === undefined && this.blocks[i].size >= minSize) {
         return i;
       }
     }
@@ -81,6 +81,16 @@ class Disk {
     //console.log(this.blocks.map((b, i) => [i, b]));
     console.log(decompress(this.blocks));
   }
+
+  checksum() {
+    return this.blocks
+      .map(b => Array.from({ length: b.size }, () => b.id ?? -1))
+      .flat()
+      .reduce((sum, id, index) => {
+        if (id === -1) return sum;
+        return sum + id * index;
+      })
+  }
 }
 
 function swap<T>(i: number, j: number, arr: T[]) {
@@ -88,7 +98,6 @@ function swap<T>(i: number, j: number, arr: T[]) {
   arr[i] = arr[j];
   arr[j] = temp;
 }
-
 
 function decompress(blocks: Block[]) {
   const str: string[] = [];
@@ -100,11 +109,8 @@ function decompress(blocks: Block[]) {
   return str.join('');
 }
 
-export default class DayEight extends Solution {
-
+export default class DayNine extends Solution {
   blocks: Block[] = [];
-
-
 
   firstHalf(input: string): number {
     const disk = new Disk(input);
@@ -113,17 +119,21 @@ export default class DayEight extends Solution {
       const lastFile = disk.lastFileIndex();
       disk.fillEmpty(firstEmpty, lastFile);
     }
-
-    return disk.blocks
-      .filter(b => b.isFile())
-      .map(b => Array.from({ length: b.size }, () => b.id!))
-      .flat()
-      .reduce((sum, id, index) => {
-        return sum + id * index;
-      })
+    return disk.checksum()
   }
 
   secondHalf(input: string): Result {
-    return 0;
+    const disk = new Disk(input);
+    for (let i = disk.blocks.length - 1; i >= 0; i--) {
+      if (!disk.blocks[i].isFile()) {
+        continue;
+      }
+      const freeSpaceForFile = disk.firstEmptyIndex(disk.blocks[i].size);
+      if (freeSpaceForFile === -1 || freeSpaceForFile >= i) {
+        continue;
+      }
+      disk.fillEmpty(freeSpaceForFile, i);
+    }
+    return disk.checksum();
   }
 }
