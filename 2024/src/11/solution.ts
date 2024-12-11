@@ -41,21 +41,33 @@ const RULES: Rule[] = [
 
 export default class DayEleven extends Solution {
 
-  private blink(stones: number[], rules: Rule[]) {
-    return stones.map(stone => applyFirstApplicable(stone, rules)).flat();
+  private blinkCache = new Map<string, number>()
+
+  private getNumberOfStones(n: number, iters: number) {
+    if (iters === 0) {
+      return 1;
+    }
+    const forSet = `${n}, ${iters}`;
+    if (this.blinkCache.get(forSet) !== undefined) {
+      return this.blinkCache.get(forSet);
+    }
+    const afterOneBlink = applyFirstApplicable(n, RULES);
+    const result = afterOneBlink.map(n => this.getNumberOfStones(n, iters - 1)).reduce((sum, k) => k + sum, 0);
+    this.blinkCache.set(forSet, result);
+    return result;
   }
 
   firstHalf(input: string): Result {
     const initialStones = input.split(' ').map(s => Number(s.trim()));
-    const ITERS = 25;
-    let current = initialStones;
-    for (let i = 0; i < ITERS; i++) {
-      current = this.blink(current, RULES);
-    }
-    return current.length;
+    return initialStones.map(stone => {
+      return this.getNumberOfStones(stone, 25);
+    }).reduce((acc, sum) => acc + sum, 0);
   }
 
   secondHalf(input: string): Result {
-    return 0;
+    const initialStones = input.split(' ').map(s => Number(s.trim()));
+    return initialStones.map(stone => {
+      return this.getNumberOfStones(stone, 75);
+    }).reduce((acc, sum) => acc + sum, 0);
   }
 }
